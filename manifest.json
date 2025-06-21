@@ -26,9 +26,10 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["face.png"],
+      "resources": ["face.png","face1.png","sounds/point.mp3","sounds/polyphem.mp3","images/face.png","images/face1.png"],
      "matches": ["https://dashboard.gymnasiumsteglitz.de/*"]
     }
     
   ]
 }
+  

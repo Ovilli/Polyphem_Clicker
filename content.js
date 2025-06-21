@@ -1,15 +1,10 @@
 if (!document.getElementById("face-clicker-image")) {
   const face = document.createElement("img");
-  face.src = chrome.runtime.getURL("face.png");
-
-  face.onerror = () => {
-    console.error("Failed to load face.png, switching to placeholder.");
-    face.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Profile_avatar_placeholder_large.png/600px-Profile_avatar_placeholder_large.png";
-  };
-
-  face.id = "face-clicker-image";
 
   const faceSize = 50;
+  const margin = 20;
+
+  face.id = "face-clicker-image";
 
   Object.assign(face.style, {
     position: "fixed",
@@ -20,13 +15,24 @@ if (!document.getElementById("face-clicker-image")) {
     borderRadius: "50%",
     zIndex: "9999",
     transition: "opacity 0.3s ease",
-    top: '0px',
-    left: '0px',
+    top: "0px",
+    left: "0px",
     opacity: "1",
     pointerEvents: "auto"
   });
 
-  const margin = 20;
+  face.onerror = () => {
+    console.error("Failed to load face image, switching to placeholder.");
+    face.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Profile_avatar_placeholder_large.png/600px-Profile_avatar_placeholder_large.png";
+  };
+
+  function updateFaceImageFromStorage() {
+    chrome.storage.local.get("agbAccepted", (data) => {
+      const agbAccepted = data.agbAccepted === true;
+      const imageName = agbAccepted ? "images/face.png" : "images/face1.png";
+      face.src = chrome.runtime.getURL(imageName);
+    });
+  }
 
   function moveFaceRandomly() {
     const vw = window.innerWidth;
@@ -44,6 +50,7 @@ if (!document.getElementById("face-clicker-image")) {
 
   function showFace() {
     moveFaceRandomly();
+    updateFaceImageFromStorage();
     face.style.opacity = "1";
     face.style.pointerEvents = "auto";
   }
@@ -59,7 +66,6 @@ if (!document.getElementById("face-clicker-image")) {
   let score = 0;
   let scoreLoaded = false;
 
-  // Load score safely
   chrome.storage.local.get("score", (data) => {
     if (chrome.runtime.lastError) {
       console.warn("Failed to load score:", chrome.runtime.lastError);
@@ -70,25 +76,35 @@ if (!document.getElementById("face-clicker-image")) {
     }
   });
 
-  
   face.addEventListener("click", () => {
     if (!scoreLoaded) {
       console.warn("Score not loaded yet, ignoring clicks.");
       return;
     }
+
     score++;
+
     chrome.storage.local.set({ score }, () => {
       if (chrome.runtime.lastError) {
         console.error("Failed to save score:", chrome.runtime.lastError);
         return;
       }
+
       console.log("Score saved:", score);
       hideFace();
-      
+
       const delay = 5000 + Math.random() * 5000;
       setTimeout(() => {
         showFace();
       }, delay);
     });
+  });
+
+
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === "AGB_ACCEPTED_CHANGED") {
+      const imageName = msg.accepted ? "images/face.png" : "images/face1.png";
+      face.src = chrome.runtime.getURL(imageName);
+    }
   });
 }

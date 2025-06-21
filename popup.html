@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-   <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Polyphem Clicker</title>
   <style>
+    /* Your existing CSS here (same as before) */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background: #121212; 
-      color: #ccc; 
+      background: #121212;
+      color: #ccc;
       width: 220px;
       margin: 0;
       padding: 25px 20px;
       border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9); 
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
       text-align: center;
       user-select: none;
       animation: fadeInScale 0.6s ease forwards;
@@ -24,9 +25,7 @@
       margin: 0 0 15px;
       font-weight: 700;
       font-size: 1.6rem;
-      letter-spacing: 1px;
       color: #eee;
-      text-shadow: none; 
     }
 
     #score {
@@ -34,12 +33,10 @@
       font-weight: 900;
       margin-bottom: 25px;
       color: #ddd;
-      text-shadow: none; 
-      animation: none; 
     }
 
     button {
-      background: #222; 
+      background: #222;
       border: none;
       border-radius: 50px;
       padding: 12px 0;
@@ -50,23 +47,20 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
       transition: background 0.3s ease, transform 0.2s ease;
-      user-select: none;
     }
 
     button:hover {
-      background: #333; 
+      background: #333;
       transform: scale(1.05);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9);
     }
 
     button:active {
       transform: scale(0.95);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
       background: #111;
     }
 
     button:focus {
-      outline: 2px solid #444; 
+      outline: 2px solid #444;
       outline-offset: 3px;
     }
 
@@ -76,43 +70,62 @@
       border-radius: 10px;
       margin: 15px auto;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-      user-select: none;
-      box-shadow: 0 0 6px #111; 
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 6px #111;
     }
 
     img#clickTarget:hover {
       transform: scale(1.07);
-      box-shadow: 0 0 10px 2px #222; 
-    }
-
-    button#resetScore {
-      margin-top: 20px;
-      animation: none; 
     }
 
     footer {
       margin-top: 30px;
       font-size: 0.8rem;
-      color: #555; 
+      color: #555;
       font-style: italic;
-      user-select: none;
       line-height: 1.4;
     }
 
     footer a {
       color: #66ccff;
       text-decoration: none;
-      vertical-align: middle;
     }
 
     footer a:hover {
       text-decoration: underline;
     }
 
-    footer img {
-      vertical-align: middle;
-      margin-left: 4px;
+    .overlay {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 10000;
+      top: 0;
+      left: 0;
+      background-color: rgba(0,0,0,0.95);
+      overflow-x: hidden;
+      transition: 0.5s;
+    }
+
+    .overlay-content {
+      position: relative;
+      top: 10%;
+      width: 80%;
+      margin: auto;
+      text-align: center;
+      color: #ccc;
+      font-size: 1.1rem;
+    }
+
+    .closebtn {
+      position: absolute;
+      top: 20px;
+      right: 45px;
+      font-size: 60px;
+      cursor: pointer;
+      color: #aaa;
+      text-decoration: none;
+      user-select: none;
     }
 
     @keyframes fadeInScale {
@@ -125,21 +138,119 @@
         transform: scale(1);
       }
     }
+
+    .info-box {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 8px #111;
+      text-align: left;
+    }
+
+    .info-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #ccc;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .info-content {
+      color: #bbb;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .info-content[hidden] {
+      display: none;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
   </style>
 </head>
 <body>
   <h2>Polyphem Clicker</h2>
   <div id="score">Loading</div>
   <button id="resetScore">Reset Score</button>
-  <img src="images/face.png" alt="Polyphem" id="clickTarget" >
+  <img src="images/face1.png" alt="Polyphem" id="clickTarget" />
   <audio id="soundEffect" src="sounds/polyphem.mp3"></audio>
-  
+  <audio id="soundPoint" src="sounds/point.mp3"></audio>
+
+  <form>
+    <label>
+      <input type="checkbox" id="accept_agb" />
+      Accept AGB
+    </label>
+  </form>
 
   <footer>
-    READ ME <a href="https://github.com/Ovilli/Polyphem_Click/tree/master#readme" target="_blank">📗</a><br>
-    Source Code: <a href="https://github.com/Ovilli/Polyphem_Click/tree/master" target="_blank">
-      <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="Octocat" width="20" height="20" />
-    </a>
+    <div class="info-box">
+      <button class="info-toggle" aria-expanded="false" aria-controls="infoContent">
+        Info &#x25BC;
+      </button>
+      <div class="info-content" id="infoContent" hidden>
+        <p><strong>READ ME:</strong>
+          <a href="https://github.com/Ovilli/Polyphem_Click/tree/master#readme" target="_blank" rel="noopener noreferrer"> HERE</a>
+        </p>
+        <p><strong>Source Code:</strong>
+          <a href="https://github.com/Ovilli/Polyphem_Click/tree/master" target="_blank" rel="noopener noreferrer">HERE</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <button class="info-toggle" aria-expanded="false" aria-controls="leaderboard">
+        Leaderboard &#x25BC;
+      </button>
+      <div class="info-content" id="leaderboard" hidden>
+        <p><strong>Comming Soon...</strong></p>
+        <p><strong>Comming Soon...</strong></p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <button class="info-toggle" aria-expanded="false" aria-controls="settingsContent">
+        Settings &#x25BC;
+      </button>
+      <div class="info-content" id="settingsContent" hidden>
+        <label for="volmaster">Master Volume</label><br />
+        <input type="range" id="volmaster" name="vol" min="0" max="100" />
+      </div>
+    </div>
+
+    <button id="openAGB">AGB</button>
+
+    <div id="AGB" class="overlay" role="dialog" aria-modal="true" aria-labelledby="agbTitle" aria-describedby="agbDesc">
+      <a href="#" class="closebtn" aria-label="Close AGB">&times;</a>
+      <div class="overlay-content">
+        <h2 id="agbTitle">(AGB)</h2>
+        <h2>Allgemeinen Geschäftsbedingungen für Polyphem Clicker.</h2>
+        <p id="agbDesc">Alle Rechte für die Bilder wurden im Rahmen dieses Projektes Ausgeliehen...</p>
+        <p>Alle Ähnlichkeiten mit lebenden oder toten Personen sind nur rein "zufällig" entstanden.</p>
+        <h1>Rechte</h1>
+        <p>Es gelten die MIT Rechte</p>
+        <h1>Impressum</h1>
+        <p>Kontakt: <a href="mailto:schulleitung@gymnasiumsteglitz.de">schulleitung@gymnasiumsteglitz.de</a></p>
+        <h1>Datenschutzerklärung</h1>
+        <p>Kein Tracking, keine Werbung...</p>
+        <h1>Cookies:</h1>
+        <p>Nur technisch notwendiger Session-Cookie.</p>
+        <h1>Danke an : </h1>
+        <p>Alle Nutzer </p>
+        <p>An Chat Gpt (Open Ai ) für das bereit stellen der schönenen UI (dark mode + moderniesierung der gui ) </p>
+        <p> Hier könnte ihr Name stehen .... ->  </p>
+      </div>
+    </div>
   </footer>
 
   <script src="popup.js"></script>
