@@ -20,4 +20,4 @@ https://dashboard.gymnasiumsteglitz.de/
 
 
 ---
-Anything that looks similar to the real world is just weird coincidence.
+Anything that looks similar to the real world is just a weird coincidence.
