@@ -27,10 +27,20 @@ if (!document.getElementById("face-clicker-image")) {
   };
 
   function updateFaceImageFromStorage() {
+    if (!chrome.runtime || !chrome.runtime.id) {
+      console.warn("Extension context unavailable (updateFaceImageFromStorage)");
+      return;
+    }
+
     chrome.storage.local.get("agbAccepted", (data) => {
       const agbAccepted = data.agbAccepted === true;
       const imageName = agbAccepted ? "images/face.png" : "images/face1.png";
-      face.src = chrome.runtime.getURL(imageName);
+      try {
+        face.src = chrome.runtime.getURL(imageName);
+      } catch (e) {
+        console.error("Failed to get image URL:", e);
+        face.onerror();
+      }
     });
   }
 
@@ -66,15 +76,19 @@ if (!document.getElementById("face-clicker-image")) {
   let score = 0;
   let scoreLoaded = false;
 
-  chrome.storage.local.get("score", (data) => {
-    if (chrome.runtime.lastError) {
-      console.warn("Failed to load score:", chrome.runtime.lastError);
-    } else {
-      score = data.score || 0;
-      scoreLoaded = true;
-      console.log("Score loaded:", score);
-    }
-  });
+  if (chrome.runtime && chrome.runtime.id) {
+    chrome.storage.local.get("score", (data) => {
+      if (chrome.runtime.lastError) {
+        console.warn("Failed to load score:", chrome.runtime.lastError);
+      } else {
+        score = data.score || 0;
+        scoreLoaded = true;
+        console.log("Score loaded:", score);
+      }
+    });
+  } else {
+    console.warn("Extension context unavailable (loading score)");
+  }
 
   face.addEventListener("click", () => {
     if (!scoreLoaded) {
@@ -84,27 +98,37 @@ if (!document.getElementById("face-clicker-image")) {
 
     score++;
 
-    chrome.storage.local.set({ score }, () => {
-      if (chrome.runtime.lastError) {
-        console.error("Failed to save score:", chrome.runtime.lastError);
-        return;
-      }
+    if (chrome.runtime && chrome.runtime.id) {
+      chrome.storage.local.set({ score }, () => {
+        if (chrome.runtime.lastError) {
+          console.error("Failed to save score:", chrome.runtime.lastError);
+          return;
+        }
 
-      console.log("Score saved:", score);
-      hideFace();
+        console.log("Score saved:", score);
+        hideFace();
 
-      const delay = 5000 + Math.random() * 5000;
-      setTimeout(() => {
-        showFace();
-      }, delay);
-    });
-  });
-
-
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.type === "AGB_ACCEPTED_CHANGED") {
-      const imageName = msg.accepted ? "images/face.png" : "images/face1.png";
-      face.src = chrome.runtime.getURL(imageName);
+        const delay = 5000 + Math.random() * 5000;
+        setTimeout(() => {
+          showFace();
+        }, delay);
+      });
+    } else {
+      console.warn("Extension context unavailable (saving score)");
     }
   });
+
+  if (chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      if (msg.type === "AGB_ACCEPTED_CHANGED") {
+        const imageName = msg.accepted ? "images/face.png" : "images/face1.png";
+        try {
+          face.src = chrome.runtime.getURL(imageName);
+        } catch (e) {
+          console.error("Failed to update face image:", e);
+          face.onerror();
+        }
+      }
+    });
+  }
 }
